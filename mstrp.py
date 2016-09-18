@@ -148,7 +148,6 @@ def sanitize(msg):
     # Return the sanitised message
     return msg
 
-messages_remain = True
 f = open(sys.argv[1])
 mailbox = readMessages(f)
 #pdb.set_trace()
