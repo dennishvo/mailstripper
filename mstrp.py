@@ -20,9 +20,9 @@ BAD_APP_CONTENT_RE = re.compile('application/(msword|msexcel)', re.I)
 BAD_IMG_CONTENT_RE = re.compile('image/(jpeg|png|gif)', re.I)
 BAD_FILEEXT_RE = re.compile(r'(\.exe|\.zip|\.pif|\.scr|\.ps)$')
 BAD_ENC_CONTENT_RE = re.compile('base64', re.I)
-PRIV_EMAIL1 = "@suiter.com"
-PRIV_EMAIL2 = "heenlaw@aol.com"
-PRIV_SUBJ = "HVLPO2 v. Oxygen Frog"
+PRIV_EMAIL1 = "@gmail.com"
+PRIV_EMAIL2 = "@aol.com"
+PRIV_SUBJ = "somestring"
 
 #
 # read the email archive, separate into individual messages, save in a list
