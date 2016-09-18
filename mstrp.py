@@ -1,6 +1,6 @@
 #
-# mail stripper -- eliminates attachments, eliminates email content
-# that contains specific email addresses
+# mail stripper -- eliminates attachments and email messages
+# that contain specific email addresses
 # author: Dennis Kornbluh
 # Date: 9/17/2016
 #
@@ -22,6 +22,7 @@ BAD_FILEEXT_RE = re.compile(r'(\.exe|\.zip|\.pif|\.scr|\.ps)$')
 BAD_ENC_CONTENT_RE = re.compile('base64', re.I)
 PRIV_EMAIL1 = "@suiter.com"
 PRIV_EMAIL2 = "heenlaw@aol.com"
+PRIV_SUBJ = "HVLPO2 v. Oxygen Frog"
 
 #
 # read the email archive, separate into individual messages, save in a list
@@ -54,10 +55,13 @@ def attorney_client_privilege(msg):
     items.append(msg.get("Cc"))
     items.append(msg.get("Bcc"))
     for item in items:
-        if item and ((item.find(PRIV_EMAIL1) > -1) or (item.find(PRIV_EMAIL2) > -1)):
+        if item and ((item.find(PRIV_EMAIL1) > -1) or \
+         (item.find(PRIV_EMAIL2) > -1)):
             isPrivileged = True;
             break
-
+    subj = msg.get("Subject")
+    if subj and subj.find(PRIV_SUBJ) > -1:
+        isPrivileged = True
     return isPrivileged
 
 #
@@ -108,6 +112,8 @@ def sanitize(msg):
         del msg['x-exchange-antispam-report-cfa-test']
         del msg['Content-Transfer-Encoding']
         del msg['Content-Disposition']
+        del msg['Disposition-Notification-To']
+        del msg['Return-Receipt-To']
         
         replace = "---+++\n"
         msg.set_payload(replace)
