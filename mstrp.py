@@ -15,15 +15,17 @@ It had additional parameters of:
 """
 
 import re, sys, email
-import pdb
 EMAIL_START = re.compile('From \d*@xxx')
 BAD_APP_CONTENT_RE = re.compile('application/(msword|msexcel)', re.I)
 BAD_IMG_CONTENT_RE = re.compile('image/(jpeg|png|gif)', re.I)
 BAD_FILEEXT_RE = re.compile(r'(\.exe|\.zip|\.pif|\.scr|\.ps)$')
 BAD_ENC_CONTENT_RE = re.compile('base64', re.I)
-PRIV_EMAIL1 = "@anon.com"
-PRIV_EMAIL2 = "bob@aol.com"
+PRIV_EMAIL1 = "@suiter.com"
+PRIV_EMAIL2 = "heenlaw@aol.com"
 
+#
+# read the email archive, separate into individual messages, save in a list
+#
 def readMessages(file):
     mailbox = []
     msg = ''
@@ -40,6 +42,10 @@ def readMessages(file):
             msg += line
     return mailbox
 
+#
+# return true if the message should be eliminated from the archive
+# due to the presence of specific email addresses or domains
+#
 def attorney_client_privilege(msg):
     isPrivileged = False
     items = []
@@ -54,8 +60,10 @@ def attorney_client_privilege(msg):
 
     return isPrivileged
 
+#
+# sanitize the given message, return the clean version
+#
 def sanitize(msg):
-    #pdb.set_trace()
     # Strip out all payloads of a particular type
     ct = msg.get_content_type()
     # We also want to check for bad filename extensions
@@ -63,7 +71,7 @@ def sanitize(msg):
     fn = msg.get_filename()
     # We also want to check for anything base64
     enc = msg['Content-Transfer-Encoding']
-    #pdb.set_trace()
+
     if attorney_client_privilege(msg):
         del msg['Subject']
         del msg['From']
@@ -109,19 +117,17 @@ def sanitize(msg):
         BAD_IMG_CONTENT_RE.search(ct) or \
         (enc and BAD_ENC_CONTENT_RE.search(enc)) or \
         (fn and BAD_FILEEXT_RE.search(fn)):
-        # Ok. This part of the message is bad, and we're going to stomp
-        # on it. First, though, we pull out the information we're about to
-        # destroy so we can tell the user about it.
+        # This part of the message is bad, and we're going to eliminate
+        # it. Retrieve the data we're about to eliminate so we can tell 
+        # the reader about it.
 
-        # This returns the parameters to the content-type. The first entry
-        # is the content-type itself, which we already have.
+        # Fetch the parameters associated with the content-type. Skip 'content-type:',
+        # which is the first entry.
         params = msg.get_params()[1:] 
         # The parameters are a list of (key, value) pairs - join the
         # key-value with '=', and the parameter list with ', '
         params = ', '.join([ '='.join(p) for p in params ])
-        # Format up the replacement text, telling the user we ate their
-        # email attachment.
-        #pdb.set_trace()
+        # Format the replacement text, tell the reader what has been removed.
         replace = ReplaceString % dict(content_type=ct, 
                                        filename=fn, 
                                        params=params)
@@ -148,10 +154,11 @@ def sanitize(msg):
     # Return the sanitised message
     return msg
 
-messages_remain = True
+#
+# main logic
+#
 f = open(sys.argv[1])
 mailbox = readMessages(f)
-#pdb.set_trace()
 for msg in mailbox:
     em = email.message_from_string(msg)
     cleanMsg = sanitize(em)
