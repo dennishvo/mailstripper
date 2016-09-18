@@ -109,7 +109,6 @@ def sanitize(msg):
         BAD_IMG_CONTENT_RE.search(ct) or \
         (enc and BAD_ENC_CONTENT_RE.search(enc)) or \
         (fn and BAD_FILEEXT_RE.search(fn)):
-        #(emfrm and CONF_EMAIL.search(emfrm)) or \
         # Ok. This part of the message is bad, and we're going to stomp
         # on it. First, though, we pull out the information we're about to
         # destroy so we can tell the user about it.
