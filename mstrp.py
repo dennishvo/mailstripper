@@ -1,8 +1,9 @@
 #
-# mail stripper -- eliminates attachments and email messages
-# that contain specific email addresses
+# mail stripper -- eliminates attachments, email messages
+# that contain specific email addresses and subject phrases. 
 # author: Dennis Kornbluh
-# Date: 9/17/2016
+# Created: 9/17/2016
+# Updated: 9/18/2016
 #
 ReplaceString = """
 ************************************************************
@@ -14,15 +15,13 @@ It had additional parameters of:
 ************************************************************
 """
 
-import re, sys, email
+import re, sys, email, json
+import pdb
 EMAIL_START = re.compile('From \d*@xxx')
 BAD_APP_CONTENT_RE = re.compile('application/(msword|msexcel)', re.I)
 BAD_IMG_CONTENT_RE = re.compile('image/(jpeg|png|gif)', re.I)
 BAD_FILEEXT_RE = re.compile(r'(\.exe|\.zip|\.pif|\.scr|\.ps)$')
 BAD_ENC_CONTENT_RE = re.compile('base64', re.I)
-PRIV_EMAIL1 = "@suiter.com"
-PRIV_EMAIL2 = "heenlaw@aol.com"
-PRIV_SUBJ = "HVLPO2 v. Oxygen Frog"
 
 #
 # read the email archive, separate into individual messages, save in a list
@@ -45,7 +44,7 @@ def readMessages(file):
 
 #
 # return true if the message should be eliminated from the archive
-# due to the presence of specific email addresses or domains
+# due to the presence of specific email addresses or subject line phrases
 #
 def attorney_client_privilege(msg):
     isPrivileged = False
@@ -54,14 +53,24 @@ def attorney_client_privilege(msg):
     items.append(msg.get("To"))
     items.append(msg.get("Cc"))
     items.append(msg.get("Bcc"))
+    blockEmail = config['settings']['blockEmail']
     for item in items:
-        if item and ((item.find(PRIV_EMAIL1) > -1) or \
-         (item.find(PRIV_EMAIL2) > -1)):
-            isPrivileged = True;
-            break
-    subj = msg.get("Subject")
-    if subj and subj.find(PRIV_SUBJ) > -1:
-        isPrivileged = True
+        if blockEmail:
+            for email in blockEmail:
+                if email and item and (item.find(email['address']) > -1):
+                    isPrivileged = True;
+                    break
+    #
+    # don't bother searching subjects if we're already classified privileged
+    #
+    if not isPrivileged:
+        subj = msg.get("Subject")
+        blockSubjects = config['settings']['blockSubject']
+        if blockSubjects:
+            for blockSubject in blockSubjects:
+                if subj and blockSubject and subj.find(blockSubject['subject']) > -1:
+                    isPrivileged = True
+                    break
     return isPrivileged
 
 #
@@ -77,44 +86,13 @@ def sanitize(msg):
     enc = msg['Content-Transfer-Encoding']
 
     if attorney_client_privilege(msg):
-        del msg['Subject']
-        del msg['From']
-        del msg['To']
-        del msg['Cc']
-        del msg['Bcc']
-        del msg['Delivered-To']
-        del msg['Date']
-        del msg['Message-ID']
-        del msg['Received']
-        del msg['X-Originating-IP']
-        del msg['Return-Path']
-        del msg['Authentication-Results']
-        del msg['Received-SPF']
-        del msg['DKIM-Signature']
-        del msg['authentication-results']
-        del msg['In-Reply-To']
-        del msg['Thread-Index']
-        del msg['Thread-Topic']
-        del msg['X-MS-Has-Attach']
-        del msg['X-OriginatorOrg']
-        del msg['X-GM-THRID']
-        del msg['X-Received']
-        del msg['x-microsoft-antispam-prvs']
-        del msg['x-forefront-antispam-report']
-        del msg['X-MS-TNEF-Correlator']
-        del msg['References']
-        del msg['X-Gmail-Labels']
-        del msg['X-MS-Exchange-CrossTenant-originalarrivaltime']
-        del msg['x-microsoft-exchange-diagnostics']
-        del msg['X-MS-Exchange-CrossTenant-id']
-        del msg['x-ms-office365-filtering-correlation-id']
-        del msg['x-microsoft-antispam']
-        del msg['x-exchange-antispam-report-cfa-test']
-        del msg['Content-Transfer-Encoding']
-        del msg['Content-Disposition']
-        del msg['Disposition-Notification-To']
-        del msg['Return-Receipt-To']
-        
+        #
+        # get headers from config and delete from msg
+        #
+        headers = config['settings']['deleteHeader']
+        for header in headers:
+            del msg[header['header']]
+
         replace = "---+++\n"
         msg.set_payload(replace)
         msg.set_type('text/plain')
@@ -157,12 +135,28 @@ def sanitize(msg):
             payload = [ sanitize(x) for x in msg.get_payload() ]
             # We replace the payload with our list of sanitised parts
             msg.set_payload(payload)
-    # Return the sanitised message
+    # Return the sanitized message
     return msg
+
+#
+# load settings to configure execution
+#
+def loadConfig(fileName):
+    f = open(fileName)
+    configstring = f.read()
+    return json.loads(configstring)
 
 #
 # main logic
 #
+CONFIG_FILE = "config.json"
+global config
+try:
+    config = loadConfig(CONFIG_FILE)
+except:
+    print("Unable to load configuration file from '" + CONFIG_FILE + "'.")
+    exit(-1)
+
 f = open(sys.argv[1])
 mailbox = readMessages(f)
 for msg in mailbox:
