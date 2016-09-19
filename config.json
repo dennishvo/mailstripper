@@ -1,0 +1,59 @@
+{
+    "settings": {
+        "blockEmail": [
+            { "address": "@suiter.com" },
+            { "address": "heenlaw@aol.com" }
+        ],
+        "blockSubject": [
+            { "subject": "HVLPO2 v. Oxygen Frog" },
+            { "subject": "Frog" },
+            { "subject": "Suiter" },
+            { "subject": "Swantz" }
+        ],
+        "deleteHeader": [
+            { "header": "Subject" },
+            { "header": "From" },
+            { "header": "To" },
+            { "header": "Cc" },
+            { "header": "Bcc" },
+            { "header": "Delivered-To" },
+            { "header": "Date" },
+            { "header": "Message-ID" },
+            { "header": "Received" },
+            { "header": "X-Originating-IP" },
+            { "header": "Return-Path" },
+            { "header": "Authentication-Results" },
+            { "header": "Received-SPF" },
+            { "header": "DKIM-Signature" },
+            { "header": "authentication-results" },
+            { "header": "In-Reply-To" },
+            { "header": "Thread-Index" },
+            { "header": "Thread-Topic" },
+            { "header": "X-MS-Has-Attach" },
+            { "header": "X-OriginatorOrg" },
+            { "header": "X-GM-THRID" },
+            { "header": "X-Received" },
+            { "header": "x-microsoft-antispam-prvs" },
+            { "header": "x-forefront-antispam-report" },
+            { "header": "X-MS-TNEF-Correlator" },
+            { "header": "References" },
+            { "header": "X-Gmail-Labels" },
+            { "header": "X-MS-Exchange-CrossTenant-originalarrivaltime" },
+            { "header": "x-microsoft-exchange-diagnostics" },
+            { "header": "X-MS-Exchange-CrossTenant-id" },
+            { "header": "x-ms-office365-filtering-correlation-id" },
+            { "header": "x-microsoft-antispam" },
+            { "header": "x-exchange-antispam-report-cfa-test" },
+            { "header": "Content-Transfer-Encoding" },
+            { "header": "Content-Disposition" },
+            { "header": "Disposition-Notification-To" },
+            { "header": "Return-Receipt-To" },
+            { "header": "X-MS-Exchange-CrossTenant-fromentityheader" },
+            { "header": "x-exchange-antispam-report-test" },
+            { "header": "x-forefront-prvs" },
+            { "header": "X-MS-Exchange-Transport-CrossTenantHeadersStamped" },
+            { "header": "pamdiagnosticoutput" },
+            { "header": "pamdiagnosticmetadata" }
+        ]
+    }
+} 
