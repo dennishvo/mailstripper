@@ -1,9 +1,9 @@
 #
-# mail stripper -- eliminates attachments, email messages
-# that contain specific email addresses and subject phrases. 
+# mail stripper -- eliminates email messages and attachments
+# that contain specific email addresses and content. 
 # author: Dennis Kornbluh
 # Created: 9/17/2016
-# Updated: 9/18/2016
+# Updated: 9/19/2016
 #
 ReplaceString1 = """
 ********************************************************
@@ -26,7 +26,6 @@ It had additional parameters of:
 """
 
 import re, sys, email, json
-import pdb
 EMAIL_START = re.compile('From \d*@xxx')
 BAD_APP_CONTENT_RE = re.compile('application/(msword|msexcel)', re.I)
 BAD_IMG_CONTENT_RE = re.compile('image/(jpeg|png|gif)', re.I)
