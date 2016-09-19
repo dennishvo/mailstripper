@@ -94,7 +94,6 @@ def blockEmail(msg):
 def sanitize(msg):
     # If true, spit out a message to indicate what we removed and why.
     leaveClues = config['settings']['stealthMode']['leaveClues'].lower() == "true"
-    pdb.set_trace()
     # Strip out all payloads of a particular type
     ct = msg.get_content_type()
     # We also want to check for bad filename extensions
