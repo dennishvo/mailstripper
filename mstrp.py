@@ -46,8 +46,8 @@ def readMessages(file):
 # return true if the message should be eliminated from the archive
 # due to the presence of specific email addresses or subject line phrases
 #
-def attorney_client_privilege(msg):
-    isPrivileged = False
+def blockEmail(msg):
+    matchFound = False
     items = []
     items.append(msg.get("From"))
     items.append(msg.get("To"))
@@ -58,20 +58,35 @@ def attorney_client_privilege(msg):
         if blockEmail:
             for email in blockEmail:
                 if email and item and (item.find(email['address']) > -1):
-                    isPrivileged = True;
+                    matchFound = True;
                     break
+
     #
     # don't bother searching subjects if we're already classified privileged
     #
-    if not isPrivileged:
+    if not matchFound:
         subj = msg.get("Subject")
         blockSubjects = config['settings']['blockSubject']
         if blockSubjects:
             for blockSubject in blockSubjects:
-                if subj and blockSubject and subj.find(blockSubject['subject']) > -1:
-                    isPrivileged = True
+                if subj and blockSubject and subj.find(blockSubject['text']) > -1:
+                    matchFound = True
                     break
-    return isPrivileged
+
+    #
+    # do a case-insensitive search of the body of text/plain messages for keywords.
+    #
+    if not msg.is_multipart() and not matchFound:
+        body = msg.get_payload()
+        blockBodyList = config['settings']['blockBody']
+        if blockBodyList:
+            for blockText in blockBodyList:
+                if body and blockText:
+                    if body.lower().find(blockText['text'].lower()) > -1:
+                        matchFound = True
+                        break
+
+    return matchFound
 
 #
 # sanitize the given message, return the clean version
@@ -85,7 +100,7 @@ def sanitize(msg):
     # We also want to check for anything base64
     enc = msg['Content-Transfer-Encoding']
 
-    if attorney_client_privilege(msg):
+    if blockEmail(msg):
         #
         # get headers from config and delete from msg
         #
@@ -93,7 +108,7 @@ def sanitize(msg):
         for header in headers:
             del msg[header['header']]
 
-        replace = "---+++\n"
+        replace = config['settings']['blockMarker']['text']
         msg.set_payload(replace)
         msg.set_type('text/plain')
         

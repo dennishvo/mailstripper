@@ -1,14 +1,22 @@
 {
     "settings": {
+        "stealthMode": { "leaveClues": "True" },
+        "stripClue": { "text": "[mailstripper ACP]\n" },
         "blockEmail": [
             { "address": "@suiter.com" },
-            { "address": "heenlaw@aol.com" }
+            { "address": "heenlaw@aol.com" },
+            { "address": "@grosswelch.com"}
         ],
         "blockSubject": [
-            { "subject": "HVLPO2 v. Oxygen Frog" },
-            { "subject": "Frog" },
-            { "subject": "Suiter" },
-            { "subject": "Swantz" }
+            { "text": "HVLPO2 v. Oxygen Frog" },
+            { "text": "Frog" },
+            { "text": "Suiter" },
+            { "text": "Swantz" }
+        ],
+        "blockBody": [
+            { "text": "suiter.com" },
+            { "text": "grosswelch.com" },
+            { "text": "grennan" }
         ],
         "deleteHeader": [
             { "header": "Subject" },
@@ -53,7 +61,15 @@
             { "header": "x-forefront-prvs" },
             { "header": "X-MS-Exchange-Transport-CrossTenantHeadersStamped" },
             { "header": "pamdiagnosticoutput" },
-            { "header": "pamdiagnosticmetadata" }
+            { "header": "Reply-To:" },
+            { "header": "pamdiagnosticmetadata" },
+            { "header": "x-aol-global-disposition" },
+            { "header": "-AOL-SPF" },
+            { "header": "X-AOL-IP" },
+            { "header": "x-aol-sid" },
+            { "header": "X-SpamScore" },
+            { "header": "X-AOL-SCOLL-SCORE" },
+            { "header": "X-AOL-SCOLL-URL_COUNT" }
         ]
     }
 } 
