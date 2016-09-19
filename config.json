@@ -1,7 +1,7 @@
 {
     "settings": {
         "stealthMode": { "leaveClues": "True" },
-        "stripClue": { "text": "[mailstripper ACP]\n" },
+        "stripClue": { "text": "Message was deemed Attorney-Client-Privileged" },
         "blockEmail": [
             { "address": "@suiter.com" },
             { "address": "heenlaw@aol.com" },

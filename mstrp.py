@@ -5,9 +5,19 @@
 # Created: 9/17/2016
 # Updated: 9/18/2016
 #
-ReplaceString = """
+ReplaceString1 = """
 ********************************************************
-This message contained illegible data that was removed. 
+Stripped because: %(stripClue)s
+Received: %(received)s
+From: %(emailFrom)s
+To: %(emailTo)s
+Subject: %(subject)s
+********************************************************
+"""
+
+ReplaceString2 = """
+********************************************************
+Stripped because: Illegible data 
 The original type was: %(content_type)s
 The filename was: %(filename)s, 
 It had additional parameters of:
@@ -103,6 +113,16 @@ def sanitize(msg):
     enc = msg['Content-Transfer-Encoding']
 
     if blockEmail(msg):
+        # leave a message about what was blocked (or not)
+        if leaveClues:
+            replace = ReplaceString1 % dict(stripClue=config['settings']['stripClue']['text'], 
+                                           received=msg['Received'],
+                                           emailFrom=msg['From'], 
+                                           emailTo=msg['To'],
+                                           subject=msg['Subject'])
+        else:
+            replace = ''
+
         #
         # get headers from config and delete from msg
         #
@@ -110,13 +130,9 @@ def sanitize(msg):
         for header in headers:
             del msg[header['header']]
 
-        if leaveClues:
-            replace = config['settings']['stripClue']['text']
-        else:
-            replace = ''
-
         msg.set_payload(replace)
         msg.set_type('text/plain')
+
         
     elif BAD_APP_CONTENT_RE.search(ct) or \
         BAD_IMG_CONTENT_RE.search(ct) or \
@@ -133,7 +149,7 @@ def sanitize(msg):
             # key-value with '=', and the parameter list with ', '
             params = ', '.join([ '='.join(p) for p in params ])
             # Format the replacement text, tell the reader what has been removed.
-            replace = ReplaceString % dict(content_type=ct, 
+            replace = ReplaceString2 % dict(content_type=ct, 
                                            filename=fn, 
                                            params=params)
         else:
