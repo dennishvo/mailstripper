@@ -6,13 +6,13 @@
 # Updated: 9/18/2016
 #
 ReplaceString = """
-************************************************************
-This message contained illegible data that was stripped out. 
+********************************************************
+This message contained illegible data that was removed. 
 The original type was: %(content_type)s
 The filename was: %(filename)s, 
 It had additional parameters of:
 %(params)s
-************************************************************
+********************************************************
 """
 
 import re, sys, email, json
@@ -92,6 +92,9 @@ def blockEmail(msg):
 # sanitize the given message, return the clean version
 #
 def sanitize(msg):
+    # If true, spit out a message to indicate what we removed and why.
+    leaveClues = config['settings']['stealthMode']['leaveClues'].lower() == "true"
+    pdb.set_trace()
     # Strip out all payloads of a particular type
     ct = msg.get_content_type()
     # We also want to check for bad filename extensions
@@ -108,7 +111,11 @@ def sanitize(msg):
         for header in headers:
             del msg[header['header']]
 
-        replace = config['settings']['blockMarker']['text']
+        if leaveClues:
+            replace = config['settings']['stripClue']['text']
+        else:
+            replace = ''
+
         msg.set_payload(replace)
         msg.set_type('text/plain')
         
@@ -117,19 +124,22 @@ def sanitize(msg):
         (enc and BAD_ENC_CONTENT_RE.search(enc)) or \
         (fn and BAD_FILEEXT_RE.search(fn)):
         # This part of the message is bad, and we're going to eliminate
-        # it. Retrieve the data we're about to eliminate so we can tell 
+        # it. If we're leaving clues, retrieve the data we're about to eliminate so we can tell 
         # the reader about it.
+        if leaveClues:
+            # Fetch the parameters associated with the content-type. Skip 'content-type:',
+            # which is the first entry.
+            params = msg.get_params()[1:] 
+            # The parameters are a list of (key, value) pairs - join the
+            # key-value with '=', and the parameter list with ', '
+            params = ', '.join([ '='.join(p) for p in params ])
+            # Format the replacement text, tell the reader what has been removed.
+            replace = ReplaceString % dict(content_type=ct, 
+                                           filename=fn, 
+                                           params=params)
+        else:
+            replace = ''
 
-        # Fetch the parameters associated with the content-type. Skip 'content-type:',
-        # which is the first entry.
-        params = msg.get_params()[1:] 
-        # The parameters are a list of (key, value) pairs - join the
-        # key-value with '=', and the parameter list with ', '
-        params = ', '.join([ '='.join(p) for p in params ])
-        # Format the replacement text, tell the reader what has been removed.
-        replace = ReplaceString % dict(content_type=ct, 
-                                       filename=fn, 
-                                       params=params)
         # Install the text body as the new payload.
         msg.set_payload(replace)
         # Now we manually strip away any paramaters to the content-type 
