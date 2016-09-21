@@ -16,7 +16,8 @@
         "blockBody": [
             { "text": "suiter.com" },
             { "text": "grosswelch.com" },
-            { "text": "grennan" }
+            { "text": "grennan" },
+            { "text": "heenlaw@aol.com" }
         ],
         "deleteHeader": [
             { "header": "Subject" },
@@ -69,7 +70,9 @@
             { "header": "x-aol-sid" },
             { "header": "X-SpamScore" },
             { "header": "X-AOL-SCOLL-SCORE" },
-            { "header": "X-AOL-SCOLL-URL_COUNT" }
+            { "header": "X-AOL-SCOLL-URL_COUNT" },
+            { "header": "spamdiagnosticoutput" },
+            { "header": "spamdiagnosticmetadata" }
         ]
     }
 } 

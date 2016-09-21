@@ -52,11 +52,16 @@ def readMessages(file):
     return mailbox
 
 #
+# search for the presence of specific email addresses, subject line phrases,
+# or strings in the body of the message
 # return true if the message should be eliminated from the archive
-# due to the presence of specific email addresses or subject line phrases
 #
 def blockEmail(msg):
     matchFound = False
+
+    #
+    # search from/to/cc/bcc headers for email addresses
+    #
     items = []
     items.append(msg.get("From"))
     items.append(msg.get("To"))
@@ -71,7 +76,7 @@ def blockEmail(msg):
                     break
 
     #
-    # don't bother searching subjects if we're already classified privileged
+    # search subject for strings
     #
     if not matchFound:
         subj = msg.get("Subject")
@@ -83,7 +88,7 @@ def blockEmail(msg):
                     break
 
     #
-    # do a case-insensitive search of the body of text/plain messages for keywords.
+    # search the body of messages for strings
     #
     if not msg.is_multipart() and not matchFound:
         body = msg.get_payload()
@@ -91,6 +96,7 @@ def blockEmail(msg):
         if blockBodyList:
             for blockText in blockBodyList:
                 if body and blockText:
+                    # case-insensitive search
                     if body.lower().find(blockText['text'].lower()) > -1:
                         matchFound = True
                         break
