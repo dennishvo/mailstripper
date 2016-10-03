@@ -108,7 +108,7 @@ def filterEmail(msg):
 # save the emails that we're stripping
 #
 def logEmail(msg):
-    if msg != None:
+    if msg != None and msg._unixfrom != None:
         logfile.write(msg._unixfrom + '\n')
         logfile.write(str(msg) + '\n')
 
