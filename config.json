@@ -2,6 +2,7 @@
     "settings": {
         "stealthMode": { "leaveClues": "True" },
         "stripClue": { "text": "Message was deemed Attorney-Client-Privileged" },
+        "filterLog": { "file": "filtered_email.txt" },
         "blockEmail": [
             { "address": "@suiter.com" },
             { "address": "heenlaw@aol.com" },
