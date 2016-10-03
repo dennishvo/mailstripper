@@ -31,6 +31,7 @@ BAD_APP_CONTENT_RE = re.compile('application/(msword|msexcel)', re.I)
 BAD_IMG_CONTENT_RE = re.compile('image/(jpeg|png|gif)', re.I)
 BAD_FILEEXT_RE = re.compile(r'(\.exe|\.zip|\.pif|\.scr|\.ps)$')
 BAD_ENC_CONTENT_RE = re.compile('base64', re.I)
+logfile = None
 
 #
 # read the email archive, separate into individual messages, save in a list
@@ -56,7 +57,7 @@ def readMessages(file):
 # or strings in the body of the message
 # return true if the message should be eliminated from the archive
 #
-def blockEmail(msg):
+def filterEmail(msg):
     matchFound = False
 
     #
@@ -104,6 +105,14 @@ def blockEmail(msg):
     return matchFound
 
 #
+# save the emails that we're stripping
+#
+def logEmail(msg):
+    if msg != None:
+        logfile.write(msg._unixfrom + '\n')
+        logfile.write(str(msg) + '\n')
+
+#
 # sanitize the given message, return the clean version
 #
 def sanitize(msg):
@@ -117,7 +126,13 @@ def sanitize(msg):
     # We also want to check for anything base64
     enc = msg['Content-Transfer-Encoding']
 
-    if blockEmail(msg):
+    if filterEmail(msg):
+        #
+        # store all the email we're filtering out in the log file
+        #
+        if logfile:
+            logEmail(msg)
+
         # leave a message about what was blocked (or not)
         if leaveClues:
             replace = ReplaceString1 % dict(stripClue=config['settings']['stripClue']['text'], 
@@ -201,6 +216,10 @@ try:
 except:
     print("Unable to load configuration file from '" + CONFIG_FILE + "'.")
     exit(-1)
+
+fl = config['settings']['filterLog']['file']
+if len(fl) > 0:
+    logfile = open(fl, "w")
 
 f = open(sys.argv[1])
 mailbox = readMessages(f)
