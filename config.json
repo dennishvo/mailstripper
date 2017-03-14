@@ -4,9 +4,9 @@
         "stripClue": { "text": "Message was deemed Attorney-Client-Privileged" },
         "filterLog": { "file": "filtered_email.txt" },
         "blockEmail": [
-            { "address": "@suiter.com" },
-            { "address": "heenlaw@aol.com" },
-            { "address": "@grosswelch.com"}
+            { "address": "@lawyer.com" },
+            { "address": "misterlaw@aol.com" },
+            { "address": "@biglaw.com"}
         ],
         "blockSubject": [
             { "text": "Goodytwoshoes v. Evil Empire, Inc." },
