@@ -191,9 +191,9 @@ def sanitize(msg):
     else:
         # Now we check for any sub-parts to the message
         if msg.is_multipart():
-            # Call the sanitise routine on any subparts
+            # Call the sanitize routine on any subparts
             payload = [ sanitize(x) for x in msg.get_payload() ]
-            # We replace the payload with our list of sanitised parts
+            # We replace the payload with our list of sanitized parts
             msg.set_payload(payload)
     # Return the sanitized message
     return msg
